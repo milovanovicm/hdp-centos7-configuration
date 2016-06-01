@@ -1,6 +1,19 @@
 #!/bin/bash
+<<'COMMENT'
+@params
+:input ips.txt file containing the following info for all the hosts in a cluster:
 
-# SET PROXY
+my.host.name.1 host1_ip_address
+my.host.name.2 host2_ip_address
+
+Description:
+This script should be run when configuring a master node for a cluster.
+The script should be run on master node within a cluster.
+
+You must be logged in as a root user on a host.
+COMMENT
+
+# Proxy configuration
 echo http_proxy=proxy.fon.rs:8080 >> /etc/environment
 echo http_proxy=proxy.fon.rs:8080 >> /etc/yum.conf
 export http_proxy=proxy.fon.rs:8080
@@ -12,30 +25,34 @@ yum install unzip -y
 yum install wget -y
 ulimit -n 12000
 
+# Install Java - jre8u60
 cd ~
 wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" \
 "http://download.oracle.com/otn-pub/java/jdk/8u60-b27/jre-8u60-linux-x64.rpm"
 sudo yum localinstall jre-8u60-linux-x64.rpm
 rm ~/jre-8u60-linux-x64.rpm
 
-# Passwordless
+# Passwordless login master -> slaves
+cd ~
 ssh-keygen
-# SCP KEYGEN
+# scp public key to remote (slave) hosts
 while IFS=' ' read -r var1 var2
 do
-    ssh root@"$var1" mkdir -p .ssh
+    ssh root@"$var1" 'mkdir -p .ssh'
     cat .ssh/id_rsa.pub | ssh root@"$var1" 'cat >> .ssh/authorized_keys'
 done < ips.txt
 
-# NTPD
+# Disable ntpd
 yum install ntp ntpdate ntp-doc -y
 systemctl enable ntpd
 systemctl start ntpd
-# EDIT THE HOSTS FILE
+
+# Populate known hosts within a cluster
 while IFS=' ' read -r line || [[ -n "$line" ]]; do
     echo "$line" >> /etc/hosts
 done < ips.txt
-# 1.4.4.3. Edit the Network Configuration File
+
+# Disable firewall (previously iptables) - by default disabled in Centos 7 Minimal version
 # systemctl disable firewalld
 # service firewalld stop
 
@@ -44,9 +61,9 @@ setenforce 0
 sed -n -i '/SELINUX=enforcing/!p' /etc/selinux/config
 echo SELINUX=disabled >> /etc/selinux/config
 
-# Umask
+# Umask settings
 umask 0022
 echo umask 0022 >> /etc/profile
 
-# Obtain Ambari repo -- MASTER ONLY
+# Obtain Ambari repo for automated install - Ambari 2.2.2.0
 wget -nv http://public-repo-1.hortonworks.com/ambari/centos7/2.x/updates/2.2.2.0/ambari.repo -O /etc/yum.repos.d/ambari.repo
