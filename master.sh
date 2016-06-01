@@ -1,6 +1,7 @@
+#!/bin/bash
 # SET PROXY
-echo proxy=proxy.fon.rs:8080 >> /etc/environment
-echo proxy=proxy.fon.rs:8080 >> /etc/yum.conf
+echo http_proxy=proxy.fon.rs:8080 >> /etc/environment
+echo http_proxy=proxy.fon.rs:8080 >> /etc/yum.conf
 export http_proxy=proxy.fon.rs:8080
 
 # Install required packages
@@ -13,22 +14,27 @@ ulimit -n 12000
 # Passwordless
 ssh-keygen
 # SCP KEYGEN
-cd ~/.ssh/
-cat id_rsa.pub >> authorized_keys
-chmod 700 ~/.ssh
-chmod 600 ~/.ssh/authorized_keys
+while IFS=' ' read -r var1 var2
+do
+    ssh root@"$var1" mkdir -p .ssh
+    cat .ssh/id_rsa.pub | ssh root@"$var1" 'cat >> .ssh/authorized_keys'
+done < ips.txt
 
 # NTPD
 yum install ntp ntpdate ntp-doc -y
 systemctl enable ntpd
 systemctl start ntpd
 # EDIT THE HOSTS FILE
+while IFS=' ' read -r line || [[ -n "$line" ]]; do
+    echo "$line" >> /etc/hosts
+done < ips.txt
 # 1.4.4.3. Edit the Network Configuration File
 # systemctl disable firewalld
 # service firewalld stop
 
 # Disable SELINUX
 setenforce 0
+sed -n -i '/SELINUX=enforcing/!p' /etc/selinux/config
 echo SELINUX=disabled >> /etc/selinux/config
 
 # Umask
