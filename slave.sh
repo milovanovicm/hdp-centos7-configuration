@@ -12,14 +12,6 @@ yum install wget -y
 yum install nano -y
 ulimit -n 12000
 
-# Passwordless
-# ssh-keygen
-# # SCP KEYGEN
-# cd ~/.ssh/
-# cat id_rsa.pub >> authorized_keys
-# chmod 700 ~/.ssh
-# chmod 600 ~/.ssh/authorized_keys
-
 # NTPD
 yum install ntp ntpdate ntp-doc -y
 systemctl enable ntpd
