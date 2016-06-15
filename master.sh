@@ -18,9 +18,9 @@ sed -n -i '/enabled=1/!p' /etc/yum/pluginconf.d/fastestmirror.conf
 echo enabled=0 >> /etc/yum/pluginconf.d/fastestmirror.conf
 
 # Proxy configuration
-# echo http_proxy=proxy.fon.rs:8080 >> /etc/environment
-# echo http_proxy=proxy.fon.rs:8080 >> /etc/yum.conf
-# export http_proxy=proxy.fon.rs:8080
+echo http_proxy=proxy.fon.rs:8080 >> /etc/environment
+echo http_proxy=proxy.fon.rs:8080 >> /etc/yum.conf
+export http_proxy=proxy.fon.rs:8080
 
 # Install required packages
 cd ~
