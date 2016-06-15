@@ -42,15 +42,15 @@ ssh-keygen
 # scp public key to remote (slave) hosts
 while IFS=' ' read -r var1 var2
 do
-    ssh root@"$var1" 'mkdir -p .ssh'
-    cat .ssh/id_rsa.pub | ssh root@"$var1" 'cat >> .ssh/authorized_keys'
+    ssh root@"$var2" 'mkdir -p .ssh'
+    cat .ssh/id_rsa.pub | ssh root@"$var2" 'cat >> .ssh/authorized_keys'
 done < ips.txt
 
 # Enable ntpd
 yum install ntp ntpdate ntp-doc -y
 systemctl enable ntpd
 systemctl start ntpd
-service start ntpd
+# service start ntpd
 
 # Populate known hosts within a cluster
 while IFS=' ' read -r line || [[ -n "$line" ]]; do
