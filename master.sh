@@ -13,10 +13,14 @@ The script should be run on master node within a cluster.
 You must be logged in as a root user on a host.
 COMMENT
 
+# Disable yum fastestmirror
+sed -n -i '/enabled=1/!p' /etc/yum/pluginconf.d/fastestmirror.conf
+echo enabled=0 >> /etc/yum/pluginconf.d/fastestmirror.conf
+
 # Proxy configuration
-echo http_proxy=proxy.fon.rs:8080 >> /etc/environment
-echo http_proxy=proxy.fon.rs:8080 >> /etc/yum.conf
-export http_proxy=proxy.fon.rs:8080
+# echo http_proxy=proxy.fon.rs:8080 >> /etc/environment
+# echo http_proxy=proxy.fon.rs:8080 >> /etc/yum.conf
+# export http_proxy=proxy.fon.rs:8080
 
 # Install required packages
 cd ~
@@ -42,10 +46,11 @@ do
     cat .ssh/id_rsa.pub | ssh root@"$var1" 'cat >> .ssh/authorized_keys'
 done < ips.txt
 
-# Disable ntpd
+# Enable ntpd
 yum install ntp ntpdate ntp-doc -y
 systemctl enable ntpd
 systemctl start ntpd
+service start ntpd
 
 # Populate known hosts within a cluster
 while IFS=' ' read -r line || [[ -n "$line" ]]; do
@@ -67,3 +72,6 @@ echo umask 0022 >> /etc/profile
 
 # Obtain Ambari repo for automated install - Ambari 2.2.2.0
 wget -nv http://public-repo-1.hortonworks.com/ambari/centos7/2.x/updates/2.2.2.0/ambari.repo -O /etc/yum.repos.d/ambari.repo
+
+# Symbolic link to HDFS storage
+ln -s /home /data
