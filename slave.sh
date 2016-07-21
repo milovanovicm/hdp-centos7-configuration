@@ -23,7 +23,6 @@ echo http_proxy=proxy.fon.rs:8080 >> /etc/yum.conf
 export http_proxy=proxy.fon.rs:8080
 
 # Install required packages
-cd ~
 mkdir /home/hadoop
 yum install unzip -y
 yum install wget -y

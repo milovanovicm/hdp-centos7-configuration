@@ -23,21 +23,18 @@ echo http_proxy=proxy.fon.rs:8080 >> /etc/yum.conf
 export http_proxy=proxy.fon.rs:8080
 
 # Install required packages
-cd ~
 mkdir /home/hadoop
 yum install unzip -y
 yum install wget -y
 ulimit -n 12000
 
 # Install Java - jre8u60
-cd ~
 wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" \
 "http://download.oracle.com/otn-pub/java/jdk/8u60-b27/jre-8u60-linux-x64.rpm"
 sudo yum localinstall jre-8u60-linux-x64.rpm
 rm ~/jre-8u60-linux-x64.rpm
 
 # Passwordless login master -> slaves
-cd ~
 ssh-keygen
 # scp public key to remote (slave) hosts
 while IFS=' ' read -r var1 var2
