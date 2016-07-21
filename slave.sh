@@ -30,6 +30,9 @@ yum install wget -y
 yum install nano -y
 ulimit -n 12000
 
+echo '*   hard    nofile  12000' >> /etc/security/limits.conf
+echo '*   soft    nofile  12000' >> /etc/security/limits.conf
+
 # Disable ntpd
 yum install ntp ntpdate ntp-doc -y
 systemctl enable ntpd
