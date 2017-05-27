@@ -1,0 +1,21 @@
+- hosts: ambari-server
+  user: root
+  vars:
+    hdp_ambari_repo: http://public-repo-1.hortonworks.com/ambari/centos6/2.x/updates/2.5.0.3/ambari.repo
+  tasks:
+
+    - name: Add ambari repo
+      get_url:
+        url: "{{hdp_ambari_repo}}"
+        dest: /etc/yum.repos.d/ambari.repo
+
+    - name: Install Ambari server
+      yum:
+        pkg: ambari-server
+        state: installed
+ 
+    - name: Configure Ambari server
+      command: ambari-server setup -s
+ 
+    - name: Start Ambari server
+      service: name=ambari-server state=started enabled=yes
